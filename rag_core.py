@@ -20,20 +20,15 @@ def load_and_chunk(pdf_path: str):
     print(f"Created {len(chunks)} chunks from {len(documents)} pages")
     return chunks
 
-def create_vectorstore(chunks, persist_dir="chroma_db"):
+def create_vectorstore(chunks):
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
     
-    # wipe old data so no duplicates ever build up
-    import shutil
-    if os.path.exists(persist_dir):
-        shutil.rmtree(persist_dir)
-    
+    # use in-memory mode — works on Streamlit Cloud
     vectorstore = Chroma.from_documents(
         documents=chunks,
-        embedding=embeddings,
-        persist_directory=persist_dir
+        embedding=embeddings
     )
     print(f"Stored {len(chunks)} chunks in ChromaDB")
     return vectorstore
